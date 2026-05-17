@@ -1,0 +1,41 @@
+{
+  "name": "phone_stock_app",
+  "version": "1.0.0",
+  "description": "Capacitor Android wrapper for stock_app phone testing",
+  "private": true,
+  "scripts": {
+    "cap:sync": "npx cap sync android",
+    "cap:open": "npx cap open android",
+    "android:debug": "cd android && gradle assembleDebug",
+    "android:release-apk": "cd android && gradle assembleRelease",
+    "android:release-aab": "cd android && gradle bundleRelease"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kmw1wlog/phone_stock_app.git"
+  },
+  "keywords": [
+    "capacitor",
+    "android",
+    "webview",
+    "stock-app"
+  ],
+  "author": "",
+  "license": "MIT",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/kmw1wlog/phone_stock_app/issues"
+  },
+  "homepage": "https://github.com/kmw1wlog/phone_stock_app#readme",
+  "dependencies": {
+    "@capacitor/android": "^8.3.4",
+    "@capacitor/cli": "^8.3.4",
+    "@capacitor/core": "^8.3.4"
+  },
+  "devDependencies": {
+    "typescript": "^6.0.3"
+  },
+  "engines": {
+    "node": "24.x"
+  }
+}

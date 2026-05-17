@@ -1,0 +1,73 @@
+name: Build Debug APK
+
+on:
+  workflow_dispatch:
+    inputs:
+      stock_app_web_url:
+        description: 'HTTPS URL of deployed stock_app web app'
+        required: false
+        default: 'https://stock-app-mu-three.vercel.app/'
+        type: string
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Resolve STOCK_APP_WEB_URL
+        shell: bash
+        run: |
+          if [ -n "${{ github.event.inputs.stock_app_web_url }}" ]; then
+            echo "STOCK_APP_WEB_URL=${{ github.event.inputs.stock_app_web_url }}" >> "$GITHUB_ENV"
+          elif [ -n "${{ vars.STOCK_APP_WEB_URL }}" ]; then
+            echo "STOCK_APP_WEB_URL=${{ vars.STOCK_APP_WEB_URL }}" >> "$GITHUB_ENV"
+          else
+            echo "STOCK_APP_WEB_URL=https://stock-app-mu-three.vercel.app/" >> "$GITHUB_ENV"
+          fi
+
+      - name: Validate URL
+        shell: bash
+        run: |
+          case "$STOCK_APP_WEB_URL" in
+            https://*) echo "Using $STOCK_APP_WEB_URL" ;;
+            *) echo "STOCK_APP_WEB_URL must start with https://" && exit 1 ;;
+          esac
+
+      - name: Sync Capacitor Android
+        run: npx cap sync android
+
+      - name: Build debug APK
+        working-directory: android
+        run: gradle assembleDebug
+
+      - name: Upload debug APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: phone-stock-app-debug-apk
+          path: android/app/build/outputs/apk/debug/app-debug.apk

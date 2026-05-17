@@ -46,7 +46,7 @@ npm install
 npx cap sync android
 npx cap open android
 cd "android"
-.\gradlew assembleDebug
+gradle assembleDebug
 ```
 
 ## GitHub Actions APK Download
