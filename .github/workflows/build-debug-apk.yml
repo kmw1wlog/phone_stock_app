@@ -36,9 +36,17 @@ jobs:
 
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: 8.14.3
+
+      - name: Show versions
+        run: |
+          node -v
+          npm -v
+          java -version
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci
 
       - name: Resolve STOCK_APP_WEB_URL
         shell: bash
@@ -60,11 +68,18 @@ jobs:
           esac
 
       - name: Sync Capacitor Android
-        run: npx cap sync android
+        run: npm run cap:sync
+
+      - name: Generate Gradle wrapper
+        working-directory: android
+        run: gradle wrapper --gradle-version 8.14.3
+
+      - name: Make Gradle wrapper executable
+        run: chmod +x android/gradlew
 
       - name: Build debug APK
         working-directory: android
-        run: gradle assembleDebug
+        run: ./gradlew assembleDebug
 
       - name: Upload debug APK
         uses: actions/upload-artifact@v4
