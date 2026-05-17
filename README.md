@@ -46,7 +46,7 @@ npm install
 npx cap sync android
 npx cap open android
 cd "android"
-gradle assembleDebug
+.\gradlew assembleDebug
 ```
 
 ## GitHub Actions APK Download
@@ -130,12 +130,86 @@ phone-stock-app-debug-apk
 - `release APK`: manual distribution after signing
 - `release AAB`: Play Store submission format
 
-Current scope is the debug APK only.
+## Play Store Closed Testing용 Release AAB 빌드
+
+### 현재 앱 ID
+
+```text
+com.kmw1wlog.phonestockapp
+```
+
+이 값은 Play Console에 업로드한 뒤 바꾸지 않습니다.
+
+### 현재 WebView URL
+
+```text
+https://stock-app-mu-three.vercel.app/
+```
+
+### 필요한 GitHub Secrets
+
+- `ANDROID_KEYSTORE_BASE64`
+- `ANDROID_KEYSTORE_PASSWORD`
+- `ANDROID_KEY_ALIAS`
+- `ANDROID_KEY_PASSWORD`
+
+### AAB 빌드 방법
+
+1. GitHub Repository `Settings`로 이동합니다.
+2. `Secrets and variables` → `Actions`로 이동합니다.
+3. 위 4개 secrets를 등록합니다.
+4. `Actions` → `Build Release AAB` workflow를 실행합니다.
+5. artifact `phone-stock-app-release-aab`를 다운로드합니다.
+6. 압축 해제 후 `app-release.aab`를 Play Console closed testing에 업로드합니다.
+
+### versionCode 규칙
+
+AAB를 새로 업로드할 때마다 `versionCode`를 반드시 올립니다.
+
+예시:
+
+- `0.1.0` / `versionCode 1`: 최초 closed testing
+- `0.1.1` / `versionCode 2`: 피드 UI 수정
+- `0.1.2` / `versionCode 3`: 알림 UX 수정
+- `0.2.0` / `versionCode 10`: worker/data 연동
+
+### Windows PowerShell release 빌드 예시
+
+```powershell
+npm install
+npx cap sync android
+cd "android"
+.\gradlew bundleRelease
+```
+
+### Keystore 생성과 Secrets 등록
+
+keystore 파일은 레포에 커밋하지 않습니다.
+
+PowerShell 기준 예시:
+
+```powershell
+keytool -genkeypair -v -keystore "release-keystore.jks" -storetype JKS -keyalg RSA -keysize 2048 -validity 10000 -alias "phone-stock-app"
+[Convert]::ToBase64String([IO.File]::ReadAllBytes("release-keystore.jks")) | Set-Content "release-keystore.base64"
+```
+
+GitHub Secrets:
+
+- `ANDROID_KEYSTORE_BASE64`: `release-keystore.base64` 파일 내용
+- `ANDROID_KEYSTORE_PASSWORD`: keystore 생성 시 입력한 store password
+- `ANDROID_KEY_ALIAS`: `phone-stock-app`
+- `ANDROID_KEY_PASSWORD`: keystore 생성 시 입력한 key password
+
+보안 주의:
+
+- `release-keystore.jks`
+- `release-keystore.base64`
+- keystore 비밀번호
+
+이 값들은 절대 GitHub repo에 커밋하지 말고, 로컬 PC와 별도 백업 저장소에 보관합니다.
 
 ## Not Included In This Phase
 
-- Play Store release
-- release signing
 - Android push notifications
 - DB-backed permanent alert storage
 - KIS realtime worker
