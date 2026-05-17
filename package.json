@@ -4,11 +4,11 @@
   "description": "Capacitor Android wrapper for stock_app phone testing",
   "private": true,
   "scripts": {
-    "cap:sync": "npx cap sync android",
-    "cap:open": "npx cap open android",
-    "android:debug": "cd android && gradle assembleDebug",
-    "android:release-apk": "cd android && gradle assembleRelease",
-    "android:release-aab": "cd android && gradle bundleRelease"
+    "cap:sync": "npx @capacitor/cli sync android",
+    "cap:open": "npx @capacitor/cli open android",
+    "android:debug": "cd android && ./gradlew assembleDebug",
+    "android:release-apk": "cd android && ./gradlew assembleRelease",
+    "android:release-aab": "cd android && ./gradlew bundleRelease"
   },
   "repository": {
     "type": "git",
