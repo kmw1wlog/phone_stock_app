@@ -1,0 +1,102 @@
+name: Build Release AAB
+
+on:
+  workflow_dispatch:
+    inputs:
+      stock_app_web_url:
+        description: 'HTTPS URL of deployed stock_app web app'
+        required: false
+        default: 'https://stock-app-mu-three.vercel.app/'
+        type: string
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: 8.14.3
+
+      - name: Show versions
+        run: |
+          node -v
+          npm -v
+          java -version
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Resolve STOCK_APP_WEB_URL
+        shell: bash
+        run: |
+          if [ -n "${{ github.event.inputs.stock_app_web_url }}" ]; then
+            echo "STOCK_APP_WEB_URL=${{ github.event.inputs.stock_app_web_url }}" >> "$GITHUB_ENV"
+          elif [ -n "${{ vars.STOCK_APP_WEB_URL }}" ]; then
+            echo "STOCK_APP_WEB_URL=${{ vars.STOCK_APP_WEB_URL }}" >> "$GITHUB_ENV"
+          else
+            echo "STOCK_APP_WEB_URL=https://stock-app-mu-three.vercel.app/" >> "$GITHUB_ENV"
+          fi
+
+      - name: Validate URL
+        shell: bash
+        run: |
+          case "$STOCK_APP_WEB_URL" in
+            https://*) echo "Using $STOCK_APP_WEB_URL" ;;
+            *) echo "STOCK_APP_WEB_URL must start with https://" && exit 1 ;;
+          esac
+
+      - name: Validate signing secrets
+        shell: bash
+        run: |
+          test -n "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" || (echo "ANDROID_KEYSTORE_BASE64 is missing" && exit 1)
+          test -n "${{ secrets.ANDROID_KEYSTORE_PASSWORD }}" || (echo "ANDROID_KEYSTORE_PASSWORD is missing" && exit 1)
+          test -n "${{ secrets.ANDROID_KEY_ALIAS }}" || (echo "ANDROID_KEY_ALIAS is missing" && exit 1)
+          test -n "${{ secrets.ANDROID_KEY_PASSWORD }}" || (echo "ANDROID_KEY_PASSWORD is missing" && exit 1)
+
+      - name: Decode keystore
+        shell: bash
+        run: |
+          echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 --decode > "$RUNNER_TEMP/release-keystore.jks"
+          echo "ANDROID_KEYSTORE_FILE=$RUNNER_TEMP/release-keystore.jks" >> "$GITHUB_ENV"
+          echo "ANDROID_KEYSTORE_PASSWORD=${{ secrets.ANDROID_KEYSTORE_PASSWORD }}" >> "$GITHUB_ENV"
+          echo "ANDROID_KEY_ALIAS=${{ secrets.ANDROID_KEY_ALIAS }}" >> "$GITHUB_ENV"
+          echo "ANDROID_KEY_PASSWORD=${{ secrets.ANDROID_KEY_PASSWORD }}" >> "$GITHUB_ENV"
+
+      - name: Sync Capacitor Android
+        run: npm run cap:sync
+
+      - name: Generate Gradle wrapper
+        working-directory: android
+        run: gradle wrapper --gradle-version 8.14.3
+
+      - name: Make Gradle wrapper executable
+        run: chmod +x android/gradlew
+
+      - name: Build release AAB
+        working-directory: android
+        run: ./gradlew bundleRelease
+
+      - name: Upload release AAB
+        uses: actions/upload-artifact@v4
+        with:
+          name: phone-stock-app-release-aab
+          path: android/app/build/outputs/bundle/release/app-release.aab
