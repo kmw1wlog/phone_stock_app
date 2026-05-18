@@ -2,6 +2,14 @@
 
 `phone_stock_app` is a Capacitor Android wrapper for testing the mobile web `stock_app` on a real Android phone.
 
+## Current Release Target
+
+- app label: `급등주 for you`
+- applicationId: `com.kmw1wlog.phonestockapp`
+- current WebView URL: `https://stock-app-mu-three.vercel.app/`
+- stock_app production commit: `57b584f`
+- Android release version: `0.1.1 (versionCode 2)`
+
 ## What This Repo Does
 
 - wraps the deployed `stock_app` web app in an Android WebView
@@ -140,6 +148,14 @@ com.kmw1wlog.phonestockapp
 
 이 값은 Play Console에 업로드한 뒤 바꾸지 않습니다.
 
+### 현재 앱 표시 이름
+
+```text
+급등주 for you
+```
+
+런처 폭에 따라 일부 기기에서는 이름이 잘릴 수 있습니다. 이번 closed testing은 이 이름으로 진행합니다.
+
 ### 현재 WebView URL
 
 ```text
@@ -162,6 +178,8 @@ https://stock-app-mu-three.vercel.app/
 5. artifact `phone-stock-app-release-aab`를 다운로드합니다.
 6. 압축 해제 후 `app-release.aab`를 Play Console closed testing에 업로드합니다.
 
+`main`에 새 커밋을 push해도 같은 workflow가 자동으로 실행됩니다.
+
 ### versionCode 규칙
 
 AAB를 새로 업로드할 때마다 `versionCode`를 반드시 올립니다.
@@ -169,8 +187,8 @@ AAB를 새로 업로드할 때마다 `versionCode`를 반드시 올립니다.
 예시:
 
 - `0.1.0` / `versionCode 1`: 최초 closed testing
-- `0.1.1` / `versionCode 2`: 피드 UI 수정
-- `0.1.2` / `versionCode 3`: 알림 UX 수정
+- `0.1.1` / `versionCode 2`: 홈 카드 UI Production 반영 + closed testing 시작
+- `0.1.2` / `versionCode 3`: 이후 native wrapper 수정
 - `0.2.0` / `versionCode 10`: worker/data 연동
 
 ### Windows PowerShell release 빌드 예시

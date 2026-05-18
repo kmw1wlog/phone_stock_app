@@ -1,6 +1,6 @@
 {
   "name": "phone_stock_app",
-  "version": "1.0.0",
+  "version": "0.1.1",
   "description": "Capacitor Android wrapper for stock_app phone testing",
   "private": true,
   "scripts": {

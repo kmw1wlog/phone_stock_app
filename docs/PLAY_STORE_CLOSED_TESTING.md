@@ -5,7 +5,10 @@
 ## 현재 기준
 
 - applicationId: `com.kmw1wlog.phonestockapp`
+- 앱 이름: `급등주 for you`
 - WebView URL: `https://stock-app-mu-three.vercel.app/`
+- stock_app Production commit: `57b584f`
+- Android release version: `0.1.1 (versionCode 2)`
 - 현재 release AAB는 closed testing 시작용 최소 버전
 - 실제 push notification은 아직 포함하지 않음
 - DB 기반 영구 알림 저장은 아직 포함하지 않음
@@ -29,6 +32,8 @@
 2. `Build Release AAB` workflow를 수동 실행합니다.
 3. artifact `phone-stock-app-release-aab`를 다운로드합니다.
 4. 압축 해제 후 `app-release.aab`를 Play Console closed testing에 업로드합니다.
+
+같은 workflow는 `main` push에도 자동 실행됩니다.
 
 필요한 GitHub Secrets:
 
@@ -75,14 +80,14 @@ Play Console에 새 AAB를 올릴 때마다 `versionCode`는 반드시 이전보
 
 현재 기준:
 
-- `versionCode 1`
-- `versionName 0.1.0`
+- `versionCode 2`
+- `versionName 0.1.1`
 
 운영 규칙:
 
 - `0.1.0` / `1`: 최초 closed testing
-- `0.1.1` / `2`: 피드 UI 수정
-- `0.1.2` / `3`: 알림 UX 수정
+- `0.1.1` / `2`: 홈 카드 UI Production 반영 + closed testing 시작
+- `0.1.2` / `3`: 다음 native wrapper 수정
 - `0.2.0` / `10`: worker/data 연동
 
 ## 앱 ID를 바꾸면 안 되는 이유

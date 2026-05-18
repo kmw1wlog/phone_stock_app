@@ -9,7 +9,7 @@ if (!isHttps) {
 
 const config: CapacitorConfig = {
   appId: 'com.kmw1wlog.phonestockapp',
-  appName: 'Phone Stock App',
+  appName: '급등주 for you',
   webDir: 'www',
   server: {
     url: appUrl,
